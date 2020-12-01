@@ -8,10 +8,7 @@ tensorflow projects for diagnosis and prognostic estimation of COVID-19
 - Tensorflow 2.0.0 with GPU
 
 ## network architecture (see achitecture.pptx)
-![首页](tf_covid19_care/images/architecture.PNG)
-![详情](https://github.com/javaSwing/NeteaseCloudWebApp/raw/master/screenshots/2.png)
-![动图](https://github.com/javaSwing/NeteaseCloudWebApp/raw/master/screenshots/3.gif)
-![动图](https://github.com/javaSwing/NeteaseCloudWebApp/raw/master/screenshots/4.gif)
+![netwok architecture](tf_covid19_care/images/architecture.PNG)
 
 ## 安装运行（Build Setup）
 
