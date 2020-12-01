@@ -7,7 +7,7 @@ tensorflow projects for diagnosis and prognostic estimation of COVID-19
 - Anaconda python 3.7.3 Win10
 - Tensorflow 2.0.0 with GPU
 
-## 运行截图
+## network architecture (see achitecture.pptx)
 ![首页](https://github.com/javaSwing/NeteaseCloudWebApp/raw/master/screenshots/1.png)
 ![详情](https://github.com/javaSwing/NeteaseCloudWebApp/raw/master/screenshots/2.png)
 ![动图](https://github.com/javaSwing/NeteaseCloudWebApp/raw/master/screenshots/3.gif)
