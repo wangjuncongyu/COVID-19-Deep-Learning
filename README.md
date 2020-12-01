@@ -1,14 +1,11 @@
 # COVID-19-Deep-Learning
 tensorflow projects for diagnosis and prognostic estimation of COVID-19
 
-> 这是一个用VUEJS写高仿网易云音乐的webapp，只实现了APP的核心功能，这个项目会长期进行更新。
+> This is a deep-learning framework for identificating high-risk COVID-19 patients and estimating how long the patient can be cured。
 
-[在线地址](http://musicapi.duapp.com/)
-
-### 技术栈
-- 传说中的VUE全家桶(vue vue-router vuex)
-- axios
-- Muse-UI(一个基于Vue2.x的material design 风格UI框架)
+### requirments
+- Anaconda python 3.7.3 Win10
+- Tensorflow 2.0.0 with GPU
 
 ## 运行截图
 ![首页](https://github.com/javaSwing/NeteaseCloudWebApp/raw/master/screenshots/1.png)
