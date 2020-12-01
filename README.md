@@ -13,8 +13,9 @@ tensorflow projects for diagnosis and prognostic estimation of COVID-19
 ## Training
 
 ``` bash
-# install dependencies
-npm install
+# run bat batch to start training 
+cd trainers
+run_train.bat
 
 # serve with hot reload at localhost:8080
 npm run dev
