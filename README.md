@@ -1,6 +1,5 @@
 # COVID-19-Deep-Learning
 tensorflow projects for diagnosis and prognostic estimation of COVID-19
-# netease-clound-webapps
 
 > 这是一个用VUEJS写高仿网易云音乐的webapp，只实现了APP的核心功能，这个项目会长期进行更新。
 
