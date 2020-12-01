@@ -2,7 +2,7 @@
 """
 Created on Thu May 21 14:41:30 2020
 
-@author: wjcongyu
+@author: wjcongyu SJTU
 """
 import _init_pathes
 import os
