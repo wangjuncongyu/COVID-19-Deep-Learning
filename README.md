@@ -10,7 +10,7 @@ tensorflow projects for diagnosis and prognostic estimation of COVID-19
 ## network architecture (see achitecture.pptx)
 ![netwok architecture](tf_covid19_care/images/architecture.PNG)
 
-## 安装运行（Build Setup）
+## Training
 
 ``` bash
 # install dependencies
