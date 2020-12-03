@@ -12,7 +12,7 @@ tensorflow projects for diagnosis and prognostic estimation of COVID-19
 
 [pretrained model and 50 data subjects for evaluation](https://pan.baidu.com/s/1ybZmR6LbXXFDVDoLKkSdlA)
 # password for download:8vst
-#after download, unzip the checkpoint.zip and put all directories to tf_covid19_care/checkpoints
+#after download, unzip the checkpoint.zip, then put all directories of weight files as well as the files for normalization (feature_minv.npy and the feature_maxv.npy) to tf_covid19_care/checkpoints
 ## Training
 
 ``` bash
