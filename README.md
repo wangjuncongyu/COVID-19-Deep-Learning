@@ -27,7 +27,7 @@ Note: you may need to modify the configs/cfgs.py file:changing cfg.data_set to t
 (1) cd tests and run the run_test.bat file.
 (2) run the compute_metrics.py file to obtain the results.
 ```
-## results
+## Results
 ![examples of prediction](tf_covid19_care/images/result_examples.PNG)
 
 ## TODO
