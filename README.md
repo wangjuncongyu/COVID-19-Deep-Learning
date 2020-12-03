@@ -11,7 +11,8 @@ tensorflow projects for diagnosis and prognostic estimation of COVID-19
 ![netwok architecture](tf_covid19_care/images/architecture.PNG)
 
 [pretrained model and 50 data subjects for evaluation](https://pan.baidu.com/s/1ybZmR6LbXXFDVDoLKkSdlA)
-# passwords for download:8vst
+# password for download:8vst
+#after download, unzip the checkpoint.zip and put all directories to tf_covid19_care/checkpoints
 ## Training
 
 ``` bash
