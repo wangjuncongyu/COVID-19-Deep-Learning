@@ -12,6 +12,9 @@ from .data_processor import resize, hu2gray
 
 
 class DataGenerator(object):
+    '''
+    this class defines functions that used to prepare data for trarining and evaluation
+    '''
     def __init__(self, anno_files, cfg, augment=True):
         assert len(anno_files) > 0, 'no annotation file!'
         
@@ -20,7 +23,10 @@ class DataGenerator(object):
         self.augment = augment
         self.data_ready = False
         
-    def load_dataset(self):        
+    def load_dataset(self):    
+        '''
+        After instantiation of this class, call this function to load data from the csv file
+        '''
         self.patients=[]
         self.total = 0
         self.datset_root = ''
@@ -58,7 +64,10 @@ class DataGenerator(object):
         return self.total   
     
   
-    def next_batch(self, batch_size, recycle = True):        
+    def next_batch(self, batch_size, train_mode = True): 
+        '''
+        cals this fuction to get a mini-batch that can be fed to the model
+        '''
         if batch_size>self.total:
             batch_size = self.total
             
@@ -71,7 +80,7 @@ class DataGenerator(object):
         for k in range(batch_size):         
             current_patient_idx = self.samples_idx[int((self.current_idx + k) % len(self.samples_idx))]
             patient= self.patients[current_patient_idx, ...]
-            if recycle==False and self.current_idx+k>=len(self.samples_idx):
+            if train_mode==False and self.current_idx+k>=len(self.samples_idx):
                 continue
             
             patient_info = patient[1:50]
@@ -103,11 +112,8 @@ class DataGenerator(object):
         bt_treatment_days = np.array(bt_treatment_days,dtype=np.int32)-1
         bt_ims = np.array(bt_ims,dtype=np.float32)
         bt_event_indicator = np.array(bt_event_indicator,dtype=np.int32)
-        bt_severity = np.array(bt_severity,dtype=np.int32)
-        
-        bt_severity[bt_severity<=1] = 0
-        bt_severity[bt_severity>1] = 1
-       
+        bt_severity = np.array(bt_severity,dtype=np.int32)        
+     
         #sorting according to treatment time
         sort_idx = np.argsort(bt_treatment_days)
         bt_painfo = bt_painfo[sort_idx]
@@ -124,22 +130,8 @@ class DataGenerator(object):
             np.random.shuffle(self.samples_idx)            
       
         return bt_painfo, bt_treatment_scheme, bt_ims, bt_treatment_days, bt_event_indicator, bt_severity
- 
-    
-    def __compute_sample_weights(self, treatment_days):
-        treatday_disr = np.zeros((np.max(treatment_days)+1))
-        for a in treatment_days:
-            treatday_disr[a]+=1
-        weights = treatday_disr.copy()
-        weights[weights==0] = 1.0
-        weights = treatment_days.shape[0]/weights
-        #print(weights)
-        sample_weights = np.zeros_like(treatment_days, dtype=np.float32)
-        for i in range(sample_weights.shape[0]):
-            sample_weights[i] = weights[treatment_days[i]]
-        
-        return np.float32(sample_weights)
-    
+     
+  
     def __augment(self,im,cfg):
         im = self.__random_rot(im)
         im = self._random_flip(im)               
@@ -148,24 +140,26 @@ class DataGenerator(object):
     def __random_rot(self, im):
         rot = np.random.choice([0, 90, 180, 270], size=1)[0]
         k = int(rot/90)
-        if k > 0: 
-            axis = np.random.choice([0, 1, 2],size=1)
-            if axis == 1:
-                im = im.transpose((1, 0, 2))
-                im = np.rot90(im,k=k)
-                im = im.transpose((1, 0, 2))
-            elif axis == 2:
-                im = im.transpose((0, 2, 1))
-                im = np.rot90(im,k=k)
-                im = im.transpose((0, 2, 1))
-            else:
-                im = np.rot90(im,k=k)
+        if k == 0:
+            return im
+        
+        axis = np.random.choice([0, 1, 2],size=1)
+        if axis == 1:
+            im = im.transpose((1, 0, 2))
+            im = np.rot90(im,k=k)
+            im = im.transpose((1, 0, 2))
+        elif axis == 2:
+            im = im.transpose((0, 2, 1))
+            im = np.rot90(im,k=k)
+            im = im.transpose((0, 2, 1))
+        else:
+            im = np.rot90(im,k=k)
         return im
     
     def _random_flip(self, im):
         flip = np.random.choice([0, 1, 2, 3],size=1)[0]
            
         if flip>0:
-                im = np.flip(im,axis = flip-1)
+            im = np.flip(im,axis = flip-1)
         return im
         

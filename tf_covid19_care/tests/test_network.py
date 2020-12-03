@@ -39,11 +39,9 @@ def main(args):
     treattype = {0:'WithoutTreatment', 1:'WithTreatment'}
     model_dir_name = args.train_subsets +'_modelweights_'+ treattype[args.gt_treatment]
    
-    total_days = 62   
-    
-    model = build_network([ cfg.treatment_infosize, cfg.im_feedsize, cfg.patient_infosize], total_days, False, name='risk_predictor')
+    model = build_network([ cfg.treatment_infosize, cfg.im_feedsize, cfg.patient_infosize], [cfg.severity_categories, cfg.time_range], False, name='risk_predictor')
 
-    feature_idx = [23, 31]
+    feature_idx = [23, 34, 35]
     
     checkpoint_file = find_weights_of_last(os.path.join(cfg.CHECKPOINTS_ROOT, model_dir_name), 'risk_predictor')
     #print('############################',os.path.join(cfg.CHECKPOINTS_ROOT, model_dir_name))
@@ -73,7 +71,8 @@ def main(args):
         os.mkdir(rst_save_root)
         
     feature_significance = []   
-    pred_probablity = []
+    severity_cls_preds = []
+    risk_reg_preds = []
     gt_hitday = []
     gt_eventindicator = []
     gt_features = []
@@ -81,8 +80,8 @@ def main(args):
    
     for step in range(eval_sample_num//(args.batch_size)+1):
         start = datetime.datetime.now()
-        evbt_painfo, evbt_treatinfo, evbt_ims, evbt_treattimes,evbt_censor_indicator, evbt_severity, _  \
-                                        = val_data_generator.next_batch(args.batch_size, False)
+        evbt_painfo, evbt_treatinfo, evbt_ims, evbt_treattimes,evbt_censor_indicator, evbt_severity  \
+                                                = val_data_generator.next_batch(args.batch_size, False)
         if args.gt_treatment==0:
             feed_treatinfo= tf.zeros_like(evbt_treatinfo)
         else:
@@ -90,11 +89,12 @@ def main(args):
        
         feed = [feed_treatinfo, evbt_ims, evbt_painfo]
             
-        coff, pred = pred_model(feed, training=False)
+        coff, cls_pred, reg_pred = pred_model(feed, training=False)
         end = datetime.datetime.now()
         print('processing time:', end-start)      
        
-        pred_probablity.append(pred)
+        severity_cls_preds.append(cls_pred)
+        risk_reg_preds.append(reg_pred)
         feature_significance.append(coff)
         gt_hitday.append(evbt_treattimes)
         gt_eventindicator.append(evbt_censor_indicator)
@@ -102,8 +102,8 @@ def main(args):
         gt_covid_severity.append(evbt_severity)
        
             
-   
-    pred_probablity = np.concatenate(pred_probablity, axis=0)
+    severity_cls_preds = np.concatenate(severity_cls_preds, axis=0)
+    risk_reg_preds = np.concatenate(risk_reg_preds, axis=0)
     feature_significance = np.concatenate(feature_significance, axis=0)
     gt_hitday = np.concatenate(gt_hitday, axis=0)
     gt_eventindicator = np.concatenate(gt_eventindicator, axis=0)
@@ -114,8 +114,12 @@ def main(args):
     pinfo_header = readCsv(eval_files[0])[0][1:50]                
     pinfo_header = pinfo_header[0:2]+pinfo_header[3:]    
     
-    csv_file = os.path.join(rst_save_root, '{0}_preds.csv'.format(args.eval_subsets))
-    save_data = pd.DataFrame(pred_probablity, columns=['day '+str(i+1) for i in range(total_days)])
+    csv_file = os.path.join(rst_save_root, '{0}_risk_reg_preds.csv'.format(args.eval_subsets))
+    save_data = pd.DataFrame(risk_reg_preds, columns=['day '+str(i+1) for i in range(cfg.time_range)])
+    save_data.to_csv(csv_file,header=True, index=False)
+    
+    csv_file = os.path.join(rst_save_root, '{0}_severity_cls_preds.csv'.format(args.eval_subsets))
+    save_data = pd.DataFrame(severity_cls_preds, columns=['low-risk(mild&moderate)','high-risk(severe&critical)'])
     save_data.to_csv(csv_file,header=True, index=False)
     
     csv_file = os.path.join(rst_save_root, '{0}_gt_hitday.csv'.format(args.eval_subsets))
@@ -130,7 +134,7 @@ def main(args):
     save_data = pd.DataFrame(gt_features, columns=pinfo_header)
     save_data.to_csv(csv_file,header=True, index=False)
    
-    csv_file = os.path.join(rst_save_root, '{0}_severity.csv'.format(args.eval_subsets))
+    csv_file = os.path.join(rst_save_root, '{0}_gt_severity.csv'.format(args.eval_subsets))
     save_data = pd.DataFrame(gt_covid_severity, columns=['severity'])
     save_data.to_csv(csv_file,header=True, index=False)  
    

@@ -55,6 +55,7 @@ def build_idx_for_rankloss(bt_treatment_days, censor_indicator):
 @tf.function
 def get_severity_cls_loss(severity_preds, gt_severity):
     gt_severity = ops.convert_to_tensor(gt_severity, dtype=tf.int32)
+    gt_severity = tf.where(gt_severity<=1, 0, 1)
     return KLOSS.SparseCategoricalCrossentropy()(gt_severity, severity_preds)
     
     
