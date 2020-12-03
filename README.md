@@ -29,6 +29,7 @@ Note: you may need to modify the configs/cfgs.py file:changing cfg.data_set to t
 ```
 ## Results
 ![examples of prediction](tf_covid19_care/images/result_examples.PNG)
+# Fig. 6. Visualization of the predicted probability distribution for four patients. The days need for a patient to be cured can be estimated by the day with the maximum probability (see the vertical dashed lines). Besides, the cumulative incidence function (e.g., P(t≤7)=37.12%) can also be calculated to assess the risk of patients. The top-3 features are shown to explain the decision made by the model. The dead patient #4 can be easily identified by observing the shape of the curve.
 
 ## TODO
 
