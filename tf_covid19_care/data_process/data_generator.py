@@ -61,8 +61,7 @@ class DataGenerator(object):
         
         np.random.shuffle(self.samples_idx)
         self.current_idx = 0
-        return self.total   
-    
+        return self.total    
   
     def next_batch(self, batch_size, train_mode = True): 
         '''
@@ -95,7 +94,7 @@ class DataGenerator(object):
             bt_treatment_scheme.append(patient[50:69])
             bt_treatment_days.append(patient[69])
             bt_event_indicator.append(patient[70])
-            im_file = osp.join(self.datset_root, 'images', patient[71])
+            im_file = osp.join(self.datset_root, 'ct_images', patient[71])
             
             if osp.exists(im_file): 
                 im_data = resize(hu2gray(np.load(im_file),WL=-500, WW=1200), self.cfg.im_feedsize)
@@ -129,9 +128,10 @@ class DataGenerator(object):
             self.current_idx = 0
             np.random.shuffle(self.samples_idx)            
       
-        return bt_painfo, bt_treatment_scheme, bt_ims, bt_treatment_days, bt_event_indicator, bt_severity
-     
+        return bt_painfo, bt_treatment_scheme, bt_ims, bt_treatment_days, bt_event_indicator, bt_severity     
   
+    
+    #=========== private function of augmnet CT images======================
     def __augment(self,im,cfg):
         im = self.__random_rot(im)
         im = self._random_flip(im)               
