@@ -30,9 +30,15 @@ Note: you may need to modify the configs/cfgs.py file:changing cfg.data_set to t
 ```
 ## Results
 ![average day error of prediction](tf_covid19_care/images/result_examples1.PNG)
-![examples of prediction](tf_covid19_care/images/result_examples.PNG)
+#The average error between predicted recovery day and true recovery day. The results demonstrate that treatment schemes have significant impact on the predictions.
+
 ![significant features for the predictions](tf_covid19_care/images/result_examples2.PNG)
-#Visualization of the predicted probability distribution for four patients. The days need for a patient to be cured can be estimated by the day with the maximum probability (see the vertical dashed lines). Besides, the cumulative incidence function (e.g., P(t≤7)=37.12%) can also be calculated to assess the risk of patients. The top-3 features are shown to explain the decision made by the model. The dead patient #4 can be easily identified by observing the shape of the curve.
+#The top 10 features with a significant impact on model prediction. AM: Albumin, HG: Hemoglobin, TP: Total Protein, α-HBDH: Alpha-hydroxybutyrate Dehydrogenase, CRP: C-reactive Protein, EPC: Expectoration, SK: Shock, PA: Poor Appetite, PS: Poor Spirits, CGH: Cough, WK: Weakness, CCBD: Chest Congestion/Breathing Difficulty, ARDS: Acute Respiratory Distress Syndrome, LDH: Lactate Dehydrogenase, DB: Diabetes. These features are significant on both prediction tasks (a and b: severity-level grading; c, d, e and f: recovery-time regression). However, the impact ranking is different among these features. The p-values calculated from multi-variable linear classification/regression analyses demonstrate that some features especially the symptoms (see the red p-values) are non-significant for linear analysis methods. 
+
+![examples of prediction](tf_covid19_care/images/result_examples.PNG)
+#Visualization of the predicted probability distribution for four patients. The days need for a patient to be cured can be estimated by the day with the maximum probability (see the vertical dashed lines). Besides, the cumulative incidence function (e.g., P(t≤7)=17.1%) can also be calculated to assess the risk of patients. The top-3 features are shown to explain the decision made by the model. The dead patient #4 can be easily identified by observing the shape of the curve.
+
+
 
 ## TODO
 
