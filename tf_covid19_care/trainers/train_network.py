@@ -73,6 +73,7 @@ def get_risk_reg_loss(risk_preds, gt_hitdays, event_indicator, rank_idx1, rank_i
     
     #loss for cured samples  
     keep_cured = tf.where(event_indicator==1)  
+   
     cured_preds = tf.gather(risk_preds, keep_cured)
     cured_labels = tf.gather(one_hot, keep_cured)  
     cured_loss = -1.0*tf.reduce_sum(cured_labels*tf.math.log(cured_preds+omega))/tf.reduce_sum(cured_labels)
@@ -112,7 +113,7 @@ def print_estimation(bt_treatment_days, bt_estimations, bt_indicator):
     '''
     Printing information for online evaluation
     '''
-    inds = np.random.choice(bt_estimations.shape[0], size=10)
+    inds = np.random.choice(bt_estimations.shape[0], size=20)
     events = {0:'censor', 1:'cured', 2:'dead'}    
     for ind in inds:
         prob_within7 = np.sum(bt_estimations[ind,0:7])
@@ -145,10 +146,10 @@ def main(args):
     if not os.path.exists(cfg.CHECKPOINTS_ROOT):
         os.mkdir(cfg.CHECKPOINTS_ROOT)
    
-    train_data_generator = DataGenerator(train_files, cfg, augment=True)
+    train_data_generator = DataGenerator(train_files, cfg, train_mode=True)
     train_data_generator.load_dataset() 
     
-    val_data_generator = DataGenerator(eval_files, cfg, augment=False)
+    val_data_generator = DataGenerator(eval_files, cfg, train_mode=False)
     eval_sample_num = val_data_generator.load_dataset()
    
     treattype = {0:'WithoutTreatment', 1:'WithTreatment'}
@@ -188,7 +189,7 @@ def main(args):
             #training one epoch with pre-defined steps
             for step in range(args.nsteps_per_epoch):
                 bt_patientinfo, bt_treatinfo, bt_ims, bt_treatment_days, bt_event_indicator, bt_severity = train_data_generator.next_batch(args.batch_size)                
-              
+            
                 if args.gt_treatment==0:
                     feed_treatinfo= tf.zeros_like(bt_treatinfo)
                 else:
@@ -250,22 +251,23 @@ def main(args):
             eval_severity_cls_preds =  np.concatenate(eval_severity_cls_preds, axis=0) 
             eval_risk_reg_preds =  np.concatenate(eval_risk_reg_preds, axis=0) 
             eval_treatment_days =  np.concatenate(eval_treatment_days, axis=0) 
+           
             eval_event_indicators =  np.concatenate(eval_event_indicators, axis=0) 
             eval_gt_severitys =  np.concatenate(eval_gt_severitys, axis=0)
             
             print_estimation(eval_treatment_days, eval_risk_reg_preds, eval_event_indicators)
-            
+         
             eval_severity_cls_loss = get_severity_cls_loss(eval_severity_cls_preds, eval_gt_severitys)
             rank_idx1, rank_idx2 = build_idx_for_rankloss(eval_treatment_days, eval_event_indicators)
             eval_cured_loss, eval_censored_loss, eval_dead_loss, eval_rank_loss = \
                                         get_risk_reg_loss(eval_risk_reg_preds, eval_treatment_days, eval_event_indicators, rank_idx1, rank_idx2, cfg.time_range)
             
-            eval_accuracy = np.mean(np.equal(np.argmax(eval_severity_cls_preds, axis=-1), eval_gt_severitys))
-            
-            eval_keep = np.where(eval_event_indicators==1)
-            eval_risk_reg_preds = eval_risk_reg_preds[eval_keep]
-            eval_treatment_days = eval_treatment_days[eval_keep]
-            mean_day_distance = np.mean(abs(np.argmax(eval_risk_reg_preds, axis=-1)-eval_treatment_days))
+            eval_accuracy = np.mean(np.equal(np.argmax(eval_severity_cls_preds, axis=-1), np.where(eval_gt_severitys<=1, 0, 1)))
+           
+                       
+            eval_pred_days = np.argmax(eval_risk_reg_preds, axis=-1)
+             
+            mean_day_distance = np.mean(np.abs(eval_pred_days-eval_treatment_days))
             print ('Lr: %f \n'\
                    '|TRAN: Cls (%f); Cured_Reg (%f); Dead_Reg (%f); Censored_Reg (%f); Rank_Reg (%f) \n'\
                    '|EVAL: Cls (%f); Cured_Reg (%f); Dead_Reg (%f); Censored_Reg (%f); Rank_Reg (%f); \n'\

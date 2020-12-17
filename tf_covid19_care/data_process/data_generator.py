@@ -15,12 +15,12 @@ class DataGenerator(object):
     '''
     this class defines functions that used to prepare data for trarining and evaluation
     '''
-    def __init__(self, anno_files, cfg, augment=True):
+    def __init__(self, anno_files, cfg, train_mode=True):
         assert len(anno_files) > 0, 'no annotation file!'
         
         self.annotation_files = anno_files
         self.cfg = cfg
-        self.augment = augment
+        self.train_mode = train_mode
         self.data_ready = False
         
     def load_dataset(self):    
@@ -39,6 +39,14 @@ class DataGenerator(object):
             self.header = pd_data.head()
             
         self.patients = np.concatenate(self.patients, axis=0)  
+        if self.train_mode:
+            days = self.patients[...,69]
+            keep = np.where(np.where(days>=20, 1, 0) * np.where(days<=30, 1, 0)==1)
+            extent_patients = self.patients[keep]
+            print('extending patients [20 30):', extent_patients.shape[0])
+            self.patients = np.concatenate([self.patients, extent_patients], axis=0)
+            
+            
        
         self.total = self.patients.shape[0]
        
@@ -63,7 +71,7 @@ class DataGenerator(object):
         self.current_idx = 0
         return self.total    
   
-    def next_batch(self, batch_size, train_mode = True): 
+    def next_batch(self, batch_size): 
         '''
         cals this fuction to get a mini-batch that can be fed to the model
         '''
@@ -79,7 +87,7 @@ class DataGenerator(object):
         for k in range(batch_size):         
             current_patient_idx = self.samples_idx[int((self.current_idx + k) % len(self.samples_idx))]
             patient= self.patients[current_patient_idx, ...]
-            if train_mode==False and self.current_idx+k>=len(self.samples_idx):
+            if self.train_mode==False and self.current_idx+k>=len(self.samples_idx):
                 continue
             
             patient_info = patient[1:50]
@@ -98,7 +106,7 @@ class DataGenerator(object):
             
             if osp.exists(im_file): 
                 im_data = resize(hu2gray(np.load(im_file),WL=-500, WW=1200), self.cfg.im_feedsize)
-                if self.augment:
+                if self.train_mode:
                     im_data = self.__augment(im_data, self.cfg)
                 im_data = im_data.reshape(im_data.shape + (1,))
                 bt_ims.append(im_data)
@@ -108,9 +116,13 @@ class DataGenerator(object):
                 
         bt_painfo = np.array(bt_painfo,dtype=np.float32)       
         bt_treatment_scheme = np.array(bt_treatment_scheme,dtype=np.float32)
-        bt_treatment_days = np.array(bt_treatment_days,dtype=np.int32)-1
+        bt_treatment_days = np.array(bt_treatment_days,dtype=np.int32)
+        bt_treatment_days[bt_treatment_days>=self.cfg.time_range-1] = self.cfg.time_range-2
+     
         bt_ims = np.array(bt_ims,dtype=np.float32)
         bt_event_indicator = np.array(bt_event_indicator,dtype=np.int32)
+        keep_death = np.where(bt_event_indicator==2)
+        bt_treatment_days[keep_death] = self.cfg.time_range-1
         bt_severity = np.array(bt_severity,dtype=np.int32)        
      
         #sorting according to treatment time

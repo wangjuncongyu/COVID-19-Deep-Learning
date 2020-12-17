@@ -21,7 +21,7 @@ import datetime
 parser = argparse.ArgumentParser()
 parser.add_argument('-train_subsets', '--train_subsets', help='the subsets for training.', type = str, default ='1;2;3')
 parser.add_argument('-eval_subsets', '--eval_subsets', help='the subset for test, others for training.', type = str, default ='4.lbl')
-parser.add_argument('-batch_size', '--batch_size', help='the mini-batch size.', type = int, default = 64)
+parser.add_argument('-batch_size', '--batch_size', help='the mini-batch size.', type = int, default = 72)
 parser.add_argument('-cuda_device', '--cuda_device', help='runining on specified gpu', type = int, default = 0)
 parser.add_argument('-gt_treatment', '--gt_treatment', help='using treatment or not.', type = int, default = 0)#1:yes 0:no
 parser.add_argument('-save_root', '--save_root', help='root path to save the prediction results.', type = str, default = 'eval_results')#1:yes 0:no
@@ -33,7 +33,7 @@ def main(args):
     for i in range(len(eval_subsets)):
         eval_files.append(os.path.join(cfg.data_set, eval_subsets[i]))
    
-    val_data_generator = DataGenerator(eval_files, cfg, augment=False)
+    val_data_generator = DataGenerator(eval_files, cfg, train_mode=False)
     eval_sample_num = val_data_generator.load_dataset()
    
     treattype = {0:'WithoutTreatment', 1:'WithTreatment'}
@@ -81,7 +81,7 @@ def main(args):
     for step in range(eval_sample_num//(args.batch_size)+1):
         start = datetime.datetime.now()
         evbt_painfo, evbt_treatinfo, evbt_ims, evbt_treattimes,evbt_censor_indicator, evbt_severity  \
-                                                = val_data_generator.next_batch(args.batch_size, False)
+                                                = val_data_generator.next_batch(args.batch_size)
         if args.gt_treatment==0:
             feed_treatinfo= tf.zeros_like(evbt_treatinfo)
         else:
