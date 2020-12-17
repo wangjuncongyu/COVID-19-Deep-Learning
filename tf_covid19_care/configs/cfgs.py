@@ -14,6 +14,6 @@ cfg.patient_infosize = 48 #[D, H, W]
 cfg.treatment_infosize = 19
 
 cfg.severity_categories = 2
-cfg.time_range = 62
+cfg.time_range = 32
 cfg.MOMENTUM = 0.09
 cfg.MAX_KEEPS_CHECKPOINTS = 1
