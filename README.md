@@ -8,6 +8,7 @@ tensorflow projects for diagnosis and prognostic estimation of COVID-19
 - Tensorflow 2.0.0 with GPU
 
 ## network architecture (see achitecture.pptx)
+![framework overview and data set](tf_covid19_care/images/framework_overview_dataset.PNG)
 ![netwok architecture](tf_covid19_care/images/architecture.PNG)
 
 [pretrained model and 50 data subjects for evaluation](https://pan.baidu.com/s/1ybZmR6LbXXFDVDoLKkSdlA)
@@ -28,7 +29,9 @@ Note: you may need to modify the configs/cfgs.py file:changing cfg.data_set to t
 (2) run the compute_metrics.py file to obtain the results.
 ```
 ## Results
+![average day error of prediction](tf_covid19_care/images/result_examples1.PNG)
 ![examples of prediction](tf_covid19_care/images/result_examples.PNG)
+![significant features for the predictions](tf_covid19_care/images/result_examples2.PNG)
 #Visualization of the predicted probability distribution for four patients. The days need for a patient to be cured can be estimated by the day with the maximum probability (see the vertical dashed lines). Besides, the cumulative incidence function (e.g., P(t≤7)=37.12%) can also be calculated to assess the risk of patients. The top-3 features are shown to explain the decision made by the model. The dead patient #4 can be easily identified by observing the shape of the curve.
 
 ## TODO
